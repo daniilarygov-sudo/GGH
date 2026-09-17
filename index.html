@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FUTURISTIC VOICE CALC // КАЛЬКУЛЯТОР ОЗВУЧКИ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Rajdhani', 'Orbitron', system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 30%, #0b0f1e, #03050b);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* футуристичные пузыри */
+    body::before {
+      content: '';
+      position: fixed;
+      width: 60vmax;
+      height: 60vmax;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.08) 0%, transparent 70%);
+      top: -20vmax;
+      right: -20vmax;
+      border-radius: 50%;
+      z-index: -1;
+      animation: float 18s infinite alternate;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      width: 50vmax;
+      height: 50vmax;
+      background: radial-gradient(circle, rgba(180, 0, 255, 0.08) 0%, transparent 70%);
+      bottom: -15vmax;
+      left: -15vmax;
+      border-radius: 50%;
+      z-index: -1;
+      animation: float 22s infinite alternate-reverse;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(5%, 5%) scale(1.1); }
+    }
+
+    .calculator-container {
+      max-width: 1400px;
+      width: 100%;
+      background: rgba(8, 15, 30, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 48px;
+      padding: 2rem 2rem 2.5rem;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.2), inset 0 0 30px rgba(0, 255, 255, 0.05);
+      transition: all 0.2s;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #a0f0ff;
+      text-shadow: 0 0 15px cyan, 0 0 40px #0088ff;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+    }
+
+    .subhead {
+      text-align: center;
+      color: #7fa9c7;
+      letter-spacing: 3px;
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+      text-transform: uppercase;
+      border-bottom: 1px dashed rgba(0, 255, 255, 0.4);
+      padding-bottom: 0.8rem;
+    }
+
+    /* сетка карточек */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .service-card {
+      background: rgba(0, 20, 40, 0.7);
+      border: 1px solid #1e90ff;
+      border-radius: 24px;
+      padding: 1rem 1.2rem 1.2rem;
+      box-shadow: 0 0 15px rgba(0, 150, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(5px);
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.2);
+      border-color: #00ffff;
+    }
+
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+      padding-bottom: 0.5rem;
+    }
+
+    .service-name {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #b0f0ff;
+      text-shadow: 0 0 8px cyan;
+      letter-spacing: 0.5px;
+    }
+
+    .service-price {
+      background: #001d3d;
+      padding: 0.25rem 0.7rem;
+      border-radius: 40px;
+      border: 1px solid #00ffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #aaffff;
+      box-shadow: 0 0 12px #00aaff;
+      white-space: nowrap;
+    }
+
+    .service-desc {
+      font-size: 0.75rem;
+      color: #8ab3cf;
+      margin-bottom: 0.8rem;
+      line-height: 1.3;
+      letter-spacing: 0.3px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      flex-wrap: wrap;
+    }
+
+    .input-group label {
+      font-size: 0.75rem;
+      color: #9cc9e0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-group input {
+      width: 90px;
+      background: #0a1a2a;
+      border: 1px solid #1e90ff;
+      border-radius: 30px;
+      padding: 8px 12px;
+      color: #e0f0ff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      outline: none;
+      transition: 0.2s;
+      text-align: center;
+      box-shadow: inset 0 0 8px rgba(0, 150, 255, 0.2);
+    }
+
+    .input-group input:focus {
+      border-color: #00ffff;
+      box-shadow: 0 0 18px cyan, inset 0 0 10px cyan;
+      background: #031a2b;
+    }
+
+    .input-group input[type="number"]::-webkit-inner-spin-button {
+      opacity: 0.8;
+    }
+
+    .unit {
+      font-size: 0.7rem;
+      color: #6c9eb8;
+      white-space: nowrap;
+    }
+
+    /* Итоговая панель */
+    .total-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, #001a33, #002244);
+      border: 2px solid #00ffff;
+      border-radius: 60px;
+      padding: 1rem 2.2rem;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.2);
+      margin-top: 1rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .total-label {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #b0f0ff;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    .total-amount {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a0ffff, #00c8ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px cyan;
+      letter-spacing: 2px;
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 2px solid #ff4d6d;
+      color: #ff99aa;
+      font-weight: 700;
+      padding: 0.7rem 2rem;
+      border-radius: 40px;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 0 15px rgba(255, 50, 100, 0.5);
+    }
+
+    .reset-btn:hover {
+      background: #ff4d6d;
+      color: #000;
+      box-shadow: 0 0 35px #ff4d6d;
+      border-color: #ff4d6d;
+    }
+
+    /* адаптив */
+    @media (max-width: 700px) {
+      .calculator-container {
+        padding: 1.5rem 1rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+        letter-spacing: 3px;
+      }
+      .total-panel {
+        flex-direction: column;
+        gap: 1rem;
+        border-radius: 40px;
+        padding: 1.2rem;
+      }
+      .total-label {
+        font-size: 1.2rem;
+      }
+      .total-amount {
+        font-size: 2.2rem;
+      }
+      .reset-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="calculator-container">
+  <h1>VOICE CALC</h1>
+  <div class="subhead">⚡ футуристичный калькулятор озвучки ⚡</div>
+
+  <div class="services-grid" id="servicesGrid">
+    <!-- карточки генерируются JS -->
+  </div>
+
+  <div class="total-panel">
+    <span class="total-label">ИТОГО:</span>
+    <span class="total-amount" id="totalAmount">0 ₽</span>
+    <button class="reset-btn" id="resetBtn">СБРОС</button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Определяем все услуги с логикой расчета
+    // pricePerUnit — базовая цена за единицу (слово, минута, герой и т.д.) — в описании
+    // calcType — определяет, как считать: 'perWord', 'perMin', 'perUnit', 'perSheet' и т.д.
+    const services = [
+      { 
+        id: 'text', 
+        name: 'Озвучить текст', 
+        priceDisplay: '250–500 ₽', 
+        desc: '2 мин = 500₽ (~260 слов/мин) / 1 мин = 250₽ (~130 слов/мин)', 
+        // логика: 250р за 1 минуту или 500р за 2 минуты, т.е. 250р/мин (до 2 мин)
+        // сделаем универсально: количество минут, округляем вверх? Но по ТЗ 1мин-250, 2мин-500.
+        // будем считать целые минуты: если введено 1 -> 250, 2 -> 500, 3 -> 750 (шаг 250)
+        // пользователь вводит минуты (целые). Но также ~260 слов/мин, значит можно вводить слова?
+        // По ТЗ неясно, но для простоты и гибкости сделаем пересчёт через минуты, т.к. "2мин-500р~260слов/1мин-250р"
+        // т.е. фактически 250р за минуту, но округление до 0.5? Нет, оставим 250 * кол-во минут (целые или дробные?)
+        // Чтобы было удобно, введём поле "минуты" (может быть дробным), но цена = 250 * минуты, но с округлением до 10?
+        // Лучше сделаем: цена = 250 * минуты (округляем вверх до целого рубля). Но пользователь может ввести 1.5 -> 375.
+        // Это логично. А для 2 мин = 500. Слова: если введёт слова, переведём: 1 мин ~ 130 слов? В описании 260слов/мин-250р — противоречие.
+        // Примем: базово 250р за 130 слов (1 мин). Значит цена = (слов / 130) * 250, округляем вверх до 10.
+        // Но чтобы не усложнять интерфейс, дадим выбор единиц: минуты или слова. Сделаем переключатель? 
+        // Слишком громоздко. Упростим: ввод в минутах (дробное число), стоимость 250 * минуты.
+        // В описании указано 2мин-500, 1мин-250, значит 250 за минуту. Ок.
+        // Аналогично для других карточек сделаем простое правило: цена за единицу (минута, слово, лист, герой и т.д.)
+        // Будем следовать описанию как есть, иногда с комбинированными полями.
+        unitLabel: 'мин',
+        pricePerUnit: 250,
+        calcType: 'linear', // price = pricePerUnit * value
+        minValue: 0,
+        step: 0.1,
+        defaultValue: 1
+      },
+      { 
+        id: 'ad', 
+        name: 'Озвучить рекламу, shorts, tiktok', 
+        priceDisplay: '500 ₽', 
+        desc: '1 мин = 500₽ (~150 слов)', 
+        unitLabel: 'мин',
+        pricePerUnit: 500,
+        calcType: 'linear',
+        defaultValue: 1
+      },
+      { 
+        id: 'trailer', 
+        name: 'Дубляж трейлера', 
+        priceDisplay: '500–1000 ₽', 
+        desc: '1 мин = 1000₽ / 30 сек = 500₽ (~50 слов)', 
+        unitLabel: 'мин',
+        pricePerUnit: 1000, // за минуту
+        calcType: 'linear',
+        defaultValue: 0.5 // 30 сек
+      },
+      { 
+        id: 'cartoon', 
+        name: 'Дубляж мультфильма', 
+        priceDisplay: '500–1000 ₽', 
+        desc: '1 герой / 30 сек = 500₽ (~90 слов) / 1 мин = 1000₽', 
+        unitLabel: 'мин',
+        pricePerUnit: 1000, // за минуту (за одного героя)
+        calcType: 'linear',
+        defaultValue: 0.5
+      },
+      { 
+        id: 'sync', 
+        name: 'Синхронизированная озвучка', 
+        priceDisplay: '1000–2000 ₽', 
+        desc: '1 герой / 30 сек = 1000₽ (~90 слов) / 1 мин = 2000₽', 
+        unitLabel: 'мин',
+        pricePerUnit: 2000,
+        calcType: 'linear',
+        defaultValue: 0.5
+      },
+      { 
+        id: 'translate', 
+        name: 'Перевести и озвучить', 
+        priceDisplay: '450 ₽/мин', 
+        desc: '(1 мин = 450₽); до 2 минут', 
+        unitLabel: 'мин',
+        pricePerUnit: 450,
+        calcType: 'linear',
+        defaultValue: 1,
+        maxValue: 2 // до 2 минут — ограничение не критично, но оставим
+      },
+      { 
+        id: 'bigtext', 
+        name: 'Озвучить большой текст', 
+        priceDisplay: '2000 ₽ (до 10 мин)', 
+        desc: 'до 10 мин = 2000₽ (~1000 слов) / после 10 мин ~ 1000 слов = 1 мин = 300₽', 
+        unitLabel: 'мин',
+        // сложная логика: до 10 минут — фикс 2000, после 10 минут — 2000 + (минуты-10)*300
+        calcType: 'bigtext',
+        basePrice: 2000,
+        baseMinutes: 10,
+        extraPerMin: 300,
+        defaultValue: 5
+      },
+      { 
+        id: 'autoresponder', 
+        name: 'Озвучить автоответчик', 
+        priceDisplay: '500 ₽', 
+        desc: '30 сек = 500₽', 
+        unitLabel: 'сек',
+        pricePerUnit: 500/30, // 16.666.. за секунду, но лучше фикс? Сделаем линейно: 500 за 30 сек, значит цена = (500/30)*сек, округляем.
+        // но пользователь может ввести 30 -> 500, 60 -> 1000. Ок.
+        calcType: 'linear',
+        defaultValue: 30,
+        step: 1,
+        unitLabel: 'сек',
+        roundTo: 10
+      },
+      { 
+        id: 'voicemenu', 
+        name: 'Голосовое меню', 
+        priceDisplay: '500 ₽', 
+        desc: '1 лист = 500₽', 
+        unitLabel: 'лист',
+        pricePerUnit: 500,
+        calcType: 'linear',
+        defaultValue: 1,
+        step: 1,
+        roundTo: 10
+      },
+      { 
+        id: 'book', 
+        name: 'Озвучить книгу', 
+        priceDisplay: '250–500 ₽', 
+        desc: '300 слов = 250₽ / 600 слов = 500₽', 
+        unitLabel: 'слов',
+        pricePerUnit: 250/300, // 0.83333 за слово
+        calcType: 'linear',
+        defaultValue: 300,
+        step: 10,
+        roundTo: 10
+      },
+      { 
+        id: 'film', 
+        name: 'Озвучить фильм', 
+        priceDisplay: '10000 ₽', 
+        desc: '1 герой / 1 мин = 500₽ (~20 мин) — итого 10000₽', 
+        unitLabel: 'мин',
+        // 1 герой, 1 мин = 500р. 20 мин = 10000р. Значит цена = 500 * минуты (за одного героя)
+        pricePerUnit: 500,
+        calcType: 'linear',
+        defaultValue: 20
+      },
+      { 
+        id: 'animedub', 
+        name: 'Дубляж аниме', 
+        priceDisplay: '5000 ₽', 
+        desc: '1 герой / 1 мин = 1000₽ (~5 мин) — итого 5000₽', 
+        unitLabel: 'мин',
+        pricePerUnit: 1000,
+        calcType: 'linear',
+        defaultValue: 5
+      },
+      { 
+        id: 'animevoice', 
+        name: 'Озвучить аниме', 
+        priceDisplay: '2500 ₽', 
+        desc: '1 герой / 1 мин = 500₽ (~5 мин) — итого 2500₽', 
+        unitLabel: 'мин',
+        pricePerUnit: 500,
+        calcType: 'linear',
+        defaultValue: 5
+      }
+    ];
+
+    // Функция расчета стоимости для конкретной услуги и значения
+    function calculateServicePrice(service, value) {
+      if (value === '' || value === null || isNaN(value) || value < 0) return 0;
+      const num = parseFloat(value);
+      if (num <= 0) return 0;
+
+      let price = 0;
+      switch (service.calcType) {
+        case 'linear':
+          price = service.pricePerUnit * num;
+          break;
+        case 'bigtext':
+          if (num <= service.baseMinutes) {
+            price = service.basePrice;
+          } else {
+            price = service.basePrice + (num - service.baseMinutes) * service.extraPerMin;
+          }
+          break;
+        default:
+          price = service.pricePerUnit * num;
+      }
+      // Округление: до 10 рублей для некоторых, или до целого
+      if (service.roundTo) {
+        price = Math.ceil(price / service.roundTo) * service.roundTo;
+      } else {
+        price = Math.ceil(price); // до целого рубля
+      }
+      return price;
+    }
+
+    // Получить объект сервиса по id
+    function getServiceById(id) {
+      return services.find(s => s.id === id);
+    }
+
+    // Обновление итоговой суммы
+    function updateTotal() {
+      let total = 0;
+      document.querySelectorAll('.service-card').forEach(card => {
+        const serviceId = card.dataset.serviceId;
+        const input = card.querySelector('input');
+        if (!input) return;
+        const service = getServiceById(serviceId);
+        if (!service) return;
+        const value = input.value.trim() === '' ? 0 : parseFloat(input.value);
+        const price = calculateServicePrice(service, value);
+        total += price;
+      });
+      document.getElementById('totalAmount').textContent = total.toLocaleString('ru-RU') + ' ₽';
+    }
+
+    // Построение интерфейса
+    function renderServices() {
+      const grid = document.getElementById('servicesGrid');
+      grid.innerHTML = '';
+
+      services.forEach(service => {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.dataset.serviceId = service.id;
+
+        // Заголовок
+        const header = document.createElement('div');
+        header.className = 'service-header';
+        header.innerHTML = `
+          <span class="service-name">${service.name}</span>
+          <span class="service-price">${service.priceDisplay}</span>
+        `;
+
+        // Описание
+        const desc = document.createElement('div');
+        desc.className = 'service-desc';
+        desc.textContent = service.desc;
+
+        // Группа ввода
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group';
+
+        const label = document.createElement('label');
+        label.textContent = 'Кол-во:';
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = service.minValue !== undefined ? service.minValue : 0;
+        input.step = service.step || 0.1;
+        input.value = service.defaultValue !== undefined ? service.defaultValue : 1;
+        input.id = `input-${service.id}`;
+
+        const unitSpan = document.createElement('span');
+        unitSpan.className = 'unit';
+        unitSpan.textContent = service.unitLabel || 'ед.';
+
+        inputGroup.appendChild(label);
+        inputGroup.appendChild(input);
+        inputGroup.appendChild(unitSpan);
+
+        card.appendChild(header);
+        card.appendChild(desc);
+        card.appendChild(inputGroup);
+
+        // Обработчик события
+        input.addEventListener('input', function(e) {
+          // Валидация: не допускаем отрицательных
+          if (this.value < 0) this.value = 0;
+          updateTotal();
+        });
+
+        grid.appendChild(card);
+      });
+
+      // После рендера обновим сумму
+      updateTotal();
+    }
+
+    // Сброс всех полей к значениям по умолчанию
+    function resetToDefaults() {
+      services.forEach(service => {
+        const input = document.getElementById(`input-${service.id}`);
+        if (input) {
+          input.value = service.defaultValue !== undefined ? service.defaultValue : 1;
+        }
+      });
+      updateTotal();
+    }
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', () => {
+      renderServices();
+
+      // Кнопка сброса
+      document.getElementById('resetBtn').addEventListener('click', resetToDefaults);
+    });
+  })();
+</script>
+</body>
+</html>
